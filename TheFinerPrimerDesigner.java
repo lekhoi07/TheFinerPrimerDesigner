@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -16,8 +17,8 @@ public class TheFinerPrimerDesigner {
     private Tab inputTab;
     public Tab designTab;
     private Tab resultsTab;
-    private Label sequence;
     private Sequence inputSequence;
+    private SequenceDisplayer displayer;
 
     public TheFinerPrimerDesigner(TabPane tabPane) {
         this.tabPane = tabPane;
@@ -55,10 +56,9 @@ public class TheFinerPrimerDesigner {
 
     private void createDesignTab() {
         this.designTab = new Tab("DESIGN YOUR PRIMERS");
-        HBox displayer = new HBox();
-        this.sequence = new Label();
-        displayer.getChildren().add(this.sequence);
-        this.designTab.setContent(displayer);
+        BorderPane designPane = new BorderPane();
+        this.displayer = new SequenceDisplayer(designPane);
+        this.designTab.setContent(designPane);
     }
 
     private void createResultsTab() {
@@ -67,7 +67,7 @@ public class TheFinerPrimerDesigner {
 
     public void setSequence(Sequence newSequence) {
         this.inputSequence = newSequence;
-        this.sequence.setText(newSequence.sequence);
+        this.displayer.setInputSequence(newSequence);
         this.tabPane.getSelectionModel().select(this.designTab);
     }
 }

@@ -64,11 +64,28 @@ public class InputProcessor {
     }
 
     private boolean isValidSequence(String sequence) {
-        char[] allowedCharacters = {'a', 't', 'c', 'g'};
+        char[] allowedCharacters = {'a', 't', 'c', 'g', 'A', 'T', 'C', 'G', ' '};
+        for (int i = 0; i < sequence.length(); i++) {
+            if (!this.isInCharArray(sequence.toCharArray()[i], allowedCharacters)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isInCharArray(char character, char[] array) {
+        for (char c : array) {
+            if (character == c) {
+                return true;
+            }
+        }
+
         return false;
     }
 
     private Sequence processSequence(String sequence) {
+        sequence = sequence.replaceAll(" ","");
+        sequence = sequence.toUpperCase();
         return new Sequence(sequence);
     }
 
