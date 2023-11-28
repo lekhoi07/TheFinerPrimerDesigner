@@ -1,6 +1,7 @@
 package indy;
 
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
@@ -14,7 +15,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        /* TODO: EVERYTHING!!! */
+        stage.setTitle("TheFinerPrimerDesigner");
+        stage.setScene(new Scene(new TabOrganizer().getRoot(), 700, 700));
+        stage.show();
     }
 
     public static void main(String[] args) {
