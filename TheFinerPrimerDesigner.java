@@ -4,9 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import jdk.internal.util.xml.impl.Input;
 
@@ -19,6 +17,7 @@ public class TheFinerPrimerDesigner {
     private Tab resultsTab;
     private Sequence inputSequence;
     private SequenceDisplayer displayer;
+    private BorderPane designPane;
 
     public TheFinerPrimerDesigner(TabPane tabPane) {
         this.tabPane = tabPane;
@@ -56,18 +55,24 @@ public class TheFinerPrimerDesigner {
 
     private void createDesignTab() {
         this.designTab = new Tab("DESIGN YOUR PRIMERS");
-        BorderPane designPane = new BorderPane();
-        this.displayer = new SequenceDisplayer(designPane);
-        this.designTab.setContent(designPane);
+        this.designPane = new BorderPane();
+        this.displayer = new SequenceDisplayer(this.designPane);
+        this.designTab.setContent(this.designPane);
     }
 
     private void createResultsTab() {
         this.resultsTab = new Tab("MY DESIGNED PRIMERS");
     }
 
-    public void setSequence(Sequence newSequence) {
+    public void setSequence(Sequence newSequence, BorderPane root) {
         this.inputSequence = newSequence;
         this.displayer.setInputSequence(newSequence);
         this.tabPane.getSelectionModel().select(this.designTab);
+
+        GridPane selectionPane = new GridPane();
+        selectionPane.setStyle("-fx-background-color: #ffffff");
+        selectionPane.getChildren().add(new Button("hi"));
+        this.designPane.setRight(selectionPane);
+        System.out.println("bae");
     }
 }

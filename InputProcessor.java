@@ -51,7 +51,7 @@ public class InputProcessor {
         OKbutton.setOnAction((ActionEvent e) -> {
             if (this.isValidSequence(textArea.getText())) {
                 this.inputSequence = this.processSequence(textArea.getText());
-                this.designer.setSequence(this.inputSequence);
+                this.designer.setSequence(this.inputSequence, this.root);
                 this.stage.close();
             } else {
                 this.errorStage = new Stage();
@@ -85,7 +85,7 @@ public class InputProcessor {
 
     private Sequence processSequence(String sequence) {
         sequence = sequence.replaceAll(" ","");
-        sequence = sequence.toUpperCase();
+        sequence = sequence.toLowerCase();
         return new Sequence(sequence);
     }
 
