@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 import javax.swing.*;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class InputProcessor {
     private BorderPane root;
@@ -51,7 +52,7 @@ public class InputProcessor {
         OKbutton.setOnAction((ActionEvent e) -> {
             if (this.isValidSequence(textArea.getText())) {
                 this.inputSequence = this.processSequence(textArea.getText());
-                this.designer.setSequence(this.inputSequence, this.root);
+                this.designer.setSequence(this.inputSequence);
                 this.stage.close();
             } else {
                 this.errorStage = new Stage();
@@ -64,7 +65,11 @@ public class InputProcessor {
     }
 
     private boolean isValidSequence(String sequence) {
-        char[] allowedCharacters = {'a', 't', 'c', 'g', 'A', 'T', 'C', 'G', ' '};
+        if (sequence.isEmpty()) {
+            return false;
+        }
+
+        char[] allowedCharacters = {'a', 't', 'c', 'g', 'A', 'T', 'C', 'G', ' ', '\n'};
         for (int i = 0; i < sequence.length(); i++) {
             if (!this.isInCharArray(sequence.toCharArray()[i], allowedCharacters)) {
                 return false;

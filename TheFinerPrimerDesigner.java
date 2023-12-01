@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import jdk.internal.util.xml.impl.Input;
 
@@ -18,6 +19,7 @@ public class TheFinerPrimerDesigner {
     private Sequence inputSequence;
     private SequenceDisplayer displayer;
     private BorderPane designPane;
+    private ScrollPane displayPane;
 
     public TheFinerPrimerDesigner(TabPane tabPane) {
         this.tabPane = tabPane;
@@ -56,6 +58,7 @@ public class TheFinerPrimerDesigner {
     private void createDesignTab() {
         this.designTab = new Tab("DESIGN YOUR PRIMERS");
         this.designPane = new BorderPane();
+        this.displayPane = new ScrollPane();
         this.displayer = new SequenceDisplayer(this.designPane);
         this.designTab.setContent(this.designPane);
     }
@@ -64,14 +67,22 @@ public class TheFinerPrimerDesigner {
         this.resultsTab = new Tab("MY DESIGNED PRIMERS");
     }
 
-    public void setSequence(Sequence newSequence, BorderPane root) {
+    public void setSequence(Sequence newSequence) {
         this.inputSequence = newSequence;
+        this.displayer.setDisplayPane(this.displayPane);
         this.displayer.setInputSequence(newSequence);
         this.tabPane.getSelectionModel().select(this.designTab);
 
         GridPane selectionPane = new GridPane();
         selectionPane.setStyle("-fx-background-color: #ffffff");
+        selectionPane.setPrefWidth(200);
         selectionPane.getChildren().add(new Button("hi"));
+
+        this.displayPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+
+        System.out.println(this.displayPane + "hi");
+
+        this.designPane.setCenter(this.displayPane);
         this.designPane.setRight(selectionPane);
         System.out.println("bae");
     }
