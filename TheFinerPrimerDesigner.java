@@ -6,6 +6,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class TheFinerPrimerDesigner {
     private TabPane tabPane;
     private Tab inputTab;
@@ -18,6 +20,10 @@ public class TheFinerPrimerDesigner {
     private ScrollPane displayPane;
     private GridPane selectionPane;
     private AutomaticPrimerDesigner automaticDesigner;
+    private ArrayList<Primer[]> results;
+
+    // TODO: replace later:
+    private Label tempResults;
 
     public TheFinerPrimerDesigner(TabPane tabPane) {
         this.tabPane = tabPane;
@@ -63,12 +69,17 @@ public class TheFinerPrimerDesigner {
         this.selectionPane.setPrefWidth(200);
         this.displayer = new SequenceDisplayer(this.designPane);
         new SequenceSelector(this.selectionPane, this.displayer);
-        this.automaticDesigner = new AutomaticPrimerDesigner(this.selectionPane, this.displayer);
+        this.automaticDesigner = new AutomaticPrimerDesigner(this.selectionPane, this.displayer, this);
         this.designTab.setContent(this.designPane);
     }
 
     private void createResultsTab() {
+        this.results = new ArrayList<>();
         this.resultsTab = new Tab("MY DESIGNED PRIMERS");
+        Pane resultsPane = new Pane();
+        this.tempResults = new Label("bleh");
+        resultsPane.getChildren().add(tempResults);
+        this.resultsTab.setContent(resultsPane);
     }
 
     public void setSequence(Sequence newSequence) {
@@ -80,5 +91,18 @@ public class TheFinerPrimerDesigner {
         this.displayPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         this.designPane.setCenter(this.displayPane);
         this.designPane.setRight(this.selectionPane);
+    }
+
+    public void setResults(ArrayList<Primer[]> newResults) {
+        this.results.addAll(newResults);
+
+        StringBuilder tmpText = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 2; j++) {
+                tmpText = tmpText.append(newResults.get(i)[j].getSequence());
+                tmpText.append("\n");
+            }
+        }
+        this.tempResults.setText(tmpText.toString());
     }
 }

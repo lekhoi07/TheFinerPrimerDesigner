@@ -4,15 +4,18 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 
-import java.util.ArrayList;
+import java.lang.reflect.Array;
+import java.util.*;
 
 
 public class AutomaticPrimerDesigner {
     private Sequence inputSequence;
     private SequenceDisplayer displayer;
+    private TheFinerPrimerDesigner designer;
 
-    public AutomaticPrimerDesigner(GridPane root, SequenceDisplayer displayer) {
+    public AutomaticPrimerDesigner(GridPane root, SequenceDisplayer displayer, TheFinerPrimerDesigner designer) {
         this.displayer = displayer;
+        this.designer = designer;
 
         Button generatePrimers = new Button("GENERATE PRIMERS");
         generatePrimers.setTranslateX(35);
@@ -28,6 +31,31 @@ public class AutomaticPrimerDesigner {
 
         ArrayList<Primer> possibleForwardPrimers = this.generatePossiblePrimers(forwardPrimerRegion, true);
         ArrayList<Primer> possibleReversePrimers = this.generatePossiblePrimers(reversePrimerRegion, false);
+
+        HashMap<Primer, Double> forwardPrimerScores = this.calculatePrimerScores(possibleForwardPrimers);
+        HashMap<Primer, Double> reversePrimerScores = this.calculatePrimerScores(possibleReversePrimers);
+
+        HashMap<Primer[], Double> primerPairCompatibilityScores = this.calculatePrimerPairCompatibilityScores(forwardPrimerScores.keySet(), reversePrimerScores.keySet());
+
+        HashMap<Primer[], Double> overallPrimerPairScores = new HashMap<>();
+        for (Primer[] primerPair : primerPairCompatibilityScores.keySet()) {
+            overallPrimerPairScores.put(primerPair, forwardPrimerScores.get(primerPair[0]) + reversePrimerScores.get(primerPair[1]) + primerPairCompatibilityScores.get(primerPair));
+        }
+
+        ArrayList<Primer[]> top10PrimerPairs = new ArrayList<>();
+        for (Primer[] primerPair : overallPrimerPairScores.keySet()) {
+            if (top10PrimerPairs.size() < 10) {
+                top10PrimerPairs.add(primerPair);
+            } else {
+                Primer[] maxScorePrimerPair = this.getMaxScorePair(top10PrimerPairs, overallPrimerPairScores);
+                if (overallPrimerPairScores.get(primerPair) < overallPrimerPairScores.get(maxScorePrimerPair)) {
+                    top10PrimerPairs.remove(maxScorePrimerPair);
+                    top10PrimerPairs.add(primerPair);
+                }
+            }
+        }
+
+        this.designer.setResults(top10PrimerPairs);
     }
 
     private ArrayList<Primer> generatePossiblePrimers(Sequence region, boolean isForwardPrimers) {
@@ -40,6 +68,52 @@ public class AutomaticPrimerDesigner {
             }
         }
         return possiblePrimers;
+    }
+
+    private HashMap<Primer, Double> calculatePrimerScores(ArrayList<Primer> primerList) {
+        HashMap<Primer, Double> primerScores = new HashMap<>();
+        for (Primer primer : primerList) {
+            primerScores.put(primer, this.gcContentScore() + this.dimerizationScore() + this.hairpinScore());
+        }
+        return primerScores;
+    }
+
+    private double gcContentScore() {
+        return Math.random();
+    }
+
+    private double dimerizationScore() {
+        return Math.random();
+    }
+
+    private double hairpinScore() {
+        return Math.random();
+    }
+
+    private HashMap<Primer[], Double> calculatePrimerPairCompatibilityScores(Set<Primer> possibleForwardPrimers, Set<Primer> possibleReversePrimers) {
+        HashMap<Primer[], Double> primerPairCompatibilityScores = new HashMap<>();
+        for (Primer forwardPrimer : possibleForwardPrimers) {
+            for (Primer reversePrimer : possibleReversePrimers) {
+                double compatibilityScore = this.dimerizationScore() + this.meltingTempCompatibilityScore();
+                primerPairCompatibilityScores.put(new Primer[]{forwardPrimer, reversePrimer}, compatibilityScore);
+            }
+        }
+        return primerPairCompatibilityScores;
+    }
+
+    private double meltingTempCompatibilityScore() {
+        return Math.random();
+    }
+
+    private Primer[] getMaxScorePair(ArrayList<Primer[]> primerList, HashMap<Primer[], Double> scores) {
+        Primer[] maxScorePrimerPair = primerList.get(0);
+        for (Primer[] primerPair : primerList) {
+            if (scores.get(primerPair) > scores.get(maxScorePrimerPair)) {
+                maxScorePrimerPair = primerPair;
+            }
+        }
+
+        return maxScorePrimerPair;
     }
 
     public void setInputSequence(Sequence inputSequence) {
