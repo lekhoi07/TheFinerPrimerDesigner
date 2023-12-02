@@ -31,6 +31,10 @@ public class AutomaticPrimerDesigner {
 
         ArrayList<Primer> possibleForwardPrimers = this.generatePossiblePrimers(forwardPrimerRegion, true);
         ArrayList<Primer> possibleReversePrimers = this.generatePossiblePrimers(reversePrimerRegion, false);
+        if (possibleForwardPrimers.isEmpty() || possibleReversePrimers.isEmpty()) {
+            this.designer.setResults(new ArrayList<>());
+            return;
+        }
 
         HashMap<Primer, Double> forwardPrimerScores = this.calculatePrimerScores(possibleForwardPrimers);
         HashMap<Primer, Double> reversePrimerScores = this.calculatePrimerScores(possibleReversePrimers);
@@ -60,6 +64,10 @@ public class AutomaticPrimerDesigner {
 
     private ArrayList<Primer> generatePossiblePrimers(Sequence region, boolean isForwardPrimers) {
         ArrayList<Primer> possiblePrimers = new ArrayList<>();
+        if (region.getLength() < 20) {
+            return possiblePrimers;
+        }
+
         for (int i = 0; i < region.getLength() - 19; i++) {
             if (isForwardPrimers) {
                 possiblePrimers.add(new ForwardPrimer(region.getSequence().substring(i, i + 20)));
@@ -73,16 +81,38 @@ public class AutomaticPrimerDesigner {
     private HashMap<Primer, Double> calculatePrimerScores(ArrayList<Primer> primerList) {
         HashMap<Primer, Double> primerScores = new HashMap<>();
         for (Primer primer : primerList) {
-            primerScores.put(primer, this.gcContentScore() + this.dimerizationScore() + this.hairpinScore());
+            primerScores.put(primer, this.gcContentScore(primer) + this.dimerizationScore(primer, primer) + this.hairpinScore());
         }
         return primerScores;
     }
 
-    private double gcContentScore() {
-        return Math.random();
+    private double gcContentScore(Primer primer) {
+        if (Math.abs(primer.getGC_Content() - 0.5) <= 0.1) {
+            return 0;
+        } else {
+            return Math.abs(primer.getGC_Content() - 0.5);
+        }
     }
 
-    private double dimerizationScore() {
+    private double dimerizationScore(Primer primer1, Primer primer2) {
+        String seq1 = primer1.getSequence();
+        String seq2 = primer2.getComplement().getReverse().getSequence();
+
+        int maxAlignmentScore = 0;
+
+        for (int i = -1 * seq1.length(); i <= seq1.length(); i++) {
+            int numComparisons = seq1.length() - Math.abs(i);
+            for (int j = 0; j < numComparisons; j++) {
+                int alignmentScore = 0;
+                if (seq1.toCharArray()[j] == seq2.toCharArray()[j + i]) {
+                    alignmentScore += 1;
+                }
+                if (alignmentScore > maxAlignmentScore) {
+                    maxAlignmentScore = alignmentScore;
+                }
+            }
+        }
+
         return Math.random();
     }
 
@@ -94,7 +124,7 @@ public class AutomaticPrimerDesigner {
         HashMap<Primer[], Double> primerPairCompatibilityScores = new HashMap<>();
         for (Primer forwardPrimer : possibleForwardPrimers) {
             for (Primer reversePrimer : possibleReversePrimers) {
-                double compatibilityScore = this.dimerizationScore() + this.meltingTempCompatibilityScore();
+                double compatibilityScore = this.dimerizationScore(forwardPrimer, reversePrimer) + this.meltingTempCompatibilityScore();
                 primerPairCompatibilityScores.put(new Primer[]{forwardPrimer, reversePrimer}, compatibilityScore);
             }
         }

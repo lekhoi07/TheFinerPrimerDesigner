@@ -43,6 +43,11 @@ public class Sequence {
         return this.sequence;
     }
 
+    public Sequence getReverse() {
+        StringBuilder reverseSequence = new StringBuilder(new Sequence(this.sequence).getComplement().getSequence()).reverse();
+        return new Sequence(reverseSequence.toString());
+    }
+
     public double getGC_Content() {
         double gcCount = 0;
         for (char c : this.sequence.toCharArray()) {

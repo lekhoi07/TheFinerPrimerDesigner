@@ -94,12 +94,13 @@ public class TheFinerPrimerDesigner {
     }
 
     public void setResults(ArrayList<Primer[]> newResults) {
+        this.tabPane.getSelectionModel().select(this.resultsTab);
         this.results.addAll(newResults);
 
         StringBuilder tmpText = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 2; j++) {
-                tmpText = tmpText.append(newResults.get(i)[j].getSequence());
+        for (Primer[] pair : this.results) {
+            for (Primer p : pair) {
+                tmpText = tmpText.append(p.getSequence());
                 tmpText.append("\n");
             }
         }
