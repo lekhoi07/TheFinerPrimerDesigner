@@ -1,7 +1,7 @@
 package indy;
 
 public class Sequence {
-    public String sequence;
+    private String sequence;
 
     public Sequence(String sequence) {
         this.sequence = sequence;
@@ -23,6 +23,12 @@ public class Sequence {
                 case 'g':
                     complementSequence.append('c');
                     break;
+                case '5':
+                    complementSequence.append('3');
+                    break;
+                case '3':
+                    complementSequence.append('5');
+                    break;
             }
         }
 
@@ -31,5 +37,45 @@ public class Sequence {
 
     public int getLength() {
         return this.sequence.length();
+    }
+
+    public String getSequence() {
+        return this.sequence;
+    }
+
+    public double getGC_Content() {
+        double gcCount = 0;
+        for (char c : this.sequence.toCharArray()) {
+            if (c == 'g' || c == 'c') {
+                gcCount += 1;
+            }
+        }
+
+        return gcCount / this.sequence.length();
+    }
+    public double getMeltingTemperature() {
+        int aCount = 0;
+        int tCount = 0;
+        int cCount = 0;
+        int gCount = 0;
+
+        for (char c : this.sequence.toCharArray()) {
+            switch (c) {
+                case 'a':
+                    aCount += 1;
+                    break;
+                case 't':
+                    tCount += 1;
+                    break;
+                case 'g':
+                    gCount += 1;
+                    break;
+                case 'c':
+                    cCount += 1;
+                    break;
+            }
+        }
+
+        return 4 * (gCount + cCount) + 2 * (aCount + tCount);
     }
 }

@@ -1,15 +1,10 @@
 package indy;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import jdk.internal.util.xml.impl.Input;
-
-import java.util.Optional;
 
 public class TheFinerPrimerDesigner {
     private TabPane tabPane;
@@ -17,9 +12,12 @@ public class TheFinerPrimerDesigner {
     public Tab designTab;
     private Tab resultsTab;
     private Sequence inputSequence;
+    private Sequence selectedSequence;
     private SequenceDisplayer displayer;
     private BorderPane designPane;
     private ScrollPane displayPane;
+    private GridPane selectionPane;
+    private AutomaticPrimerDesigner automaticDesigner;
 
     public TheFinerPrimerDesigner(TabPane tabPane) {
         this.tabPane = tabPane;
@@ -46,6 +44,7 @@ public class TheFinerPrimerDesigner {
         Button button = new Button("Get input");
         button.setOnAction(e -> {
             Stage inputStage = new Stage();
+            inputStage.setTitle("INPUT YOUR DNA SEQUENCE 5' TO 3'");
             InputProcessor processor = new InputProcessor(inputStage, this);
             inputStage.setScene(new Scene(processor.getRoot()));
             inputStage.show();
@@ -59,7 +58,12 @@ public class TheFinerPrimerDesigner {
         this.designTab = new Tab("DESIGN YOUR PRIMERS");
         this.designPane = new BorderPane();
         this.displayPane = new ScrollPane();
+        this.selectionPane = new GridPane();
+        this.selectionPane.setStyle("-fx-background-color: #ffffff");
+        this.selectionPane.setPrefWidth(200);
         this.displayer = new SequenceDisplayer(this.designPane);
+        new SequenceSelector(this.selectionPane, this.displayer);
+        this.automaticDesigner = new AutomaticPrimerDesigner(this.selectionPane, this.displayer);
         this.designTab.setContent(this.designPane);
     }
 
@@ -71,19 +75,10 @@ public class TheFinerPrimerDesigner {
         this.inputSequence = newSequence;
         this.displayer.setDisplayPane(this.displayPane);
         this.displayer.setInputSequence(newSequence);
+        this.automaticDesigner.setInputSequence(newSequence);
         this.tabPane.getSelectionModel().select(this.designTab);
-
-        GridPane selectionPane = new GridPane();
-        selectionPane.setStyle("-fx-background-color: #ffffff");
-        selectionPane.setPrefWidth(200);
-        selectionPane.getChildren().add(new Button("hi"));
-
         this.displayPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-
-        System.out.println(this.displayPane + "hi");
-
         this.designPane.setCenter(this.displayPane);
-        this.designPane.setRight(selectionPane);
-        System.out.println("bae");
+        this.designPane.setRight(this.selectionPane);
     }
 }

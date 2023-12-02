@@ -18,7 +18,7 @@ import java.util.Objects;
 public class InputProcessor {
     private BorderPane root;
     private Sequence inputSequence;
-    private Stage stage, errorStage;
+    private Stage stage;
     private TheFinerPrimerDesigner designer;
 
     public InputProcessor(Stage stage, TheFinerPrimerDesigner designer) {
@@ -52,12 +52,14 @@ public class InputProcessor {
         OKbutton.setOnAction((ActionEvent e) -> {
             if (this.isValidSequence(textArea.getText())) {
                 this.inputSequence = this.processSequence(textArea.getText());
-                this.designer.setSequence(this.inputSequence);
-                this.stage.close();
+                if (this.inputSequence.getSequence().length() > 38) {
+                    this.designer.setSequence(this.inputSequence);
+                    this.stage.close();
+                } else {
+                    new ErrorMessage("Input sequence too short");
+                }
             } else {
-                this.errorStage = new Stage();
-                this.errorStage.setScene(new Scene(this.createErrorPane()));
-                this.errorStage.show();
+                new ErrorMessage("Not a valid DNA sequence");
             }
         });
 
@@ -90,20 +92,7 @@ public class InputProcessor {
 
     private Sequence processSequence(String sequence) {
         sequence = sequence.replaceAll(" ","");
-        sequence = sequence.toLowerCase();
+        sequence = "5" + sequence.toLowerCase() + "3";
         return new Sequence(sequence);
-    }
-
-    private BorderPane createErrorPane() {
-        BorderPane errorPane = new BorderPane();
-        Label errorMessage = new Label("Please input a valid DNA sequence");
-        HBox quitButtonPane = new HBox();
-        quitButtonPane.setAlignment(Pos.CENTER);
-        Button quitButton = new Button("OK");
-        quitButton.setOnAction((ActionEvent e) -> this.errorStage.close());
-        quitButtonPane.getChildren().add(quitButton);
-        errorPane.setTop(errorMessage);
-        errorPane.setBottom(quitButtonPane);
-        return errorPane;
     }
 }
