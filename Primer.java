@@ -40,7 +40,7 @@ public class Primer extends Sequence {
         return maxAlignmentScore;
     }
 
-    private double alignmentScore() {
+    private double alignmentScore(String seq1, String seq2) {
         return 0;
     }
 
