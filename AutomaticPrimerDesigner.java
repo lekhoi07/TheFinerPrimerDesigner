@@ -70,7 +70,7 @@ public class AutomaticPrimerDesigner {
 
         for (int i = 0; i < region.getLength() - 19; i++) {
             if (isForwardPrimers) {
-                possiblePrimers.add(new ForwardPrimer(region.getSequence().substring(i, i + 20)));
+                possiblePrimers.add(new Primer(region.getSequence().substring(i, i + 20)));
             } else {
                 possiblePrimers.add(new ReversePrimer(region.getSequence().substring(i, i + 20)));
             }
