@@ -81,59 +81,19 @@ public class AutomaticPrimerDesigner {
     private HashMap<Primer, Double> calculatePrimerScores(ArrayList<Primer> primerList) {
         HashMap<Primer, Double> primerScores = new HashMap<>();
         for (Primer primer : primerList) {
-            primerScores.put(primer, this.gcContentScore(primer) + this.dimerizationScore(primer, primer) + this.hairpinScore());
+            primerScores.put(primer, primer.goodnessScore());
         }
         return primerScores;
-    }
-
-    private double gcContentScore(Primer primer) {
-        if (Math.abs(primer.getGC_Content() - 0.5) <= 0.1) {
-            return 0;
-        } else {
-            return Math.abs(primer.getGC_Content() - 0.5);
-        }
-    }
-
-    private double dimerizationScore(Primer primer1, Primer primer2) {
-        String seq1 = primer1.getSequence();
-        String seq2 = primer2.getComplement().getReverse().getSequence();
-
-        int maxAlignmentScore = 0;
-        for (int i = 0; i < seq1.length() + seq2.length() - 1; i++) {
-            int alignmentScore = 0;
-            for (int j = 0; j < seq1.length(); j++) {
-                int comparisonPosition = seq2.length() - 1 - i + j;
-                if (comparisonPosition >= 0 && comparisonPosition < seq2.length()) {
-                    if (seq1.toCharArray()[j] == seq2.toCharArray()[comparisonPosition]) {
-                        alignmentScore += 1;
-                    }
-                }
-            }
-            if (alignmentScore > maxAlignmentScore) {
-                maxAlignmentScore = alignmentScore;
-            }
-        }
-
-        return maxAlignmentScore;
-    }
-
-    private double hairpinScore() {
-        return Math.random();
     }
 
     private HashMap<Primer[], Double> calculatePrimerPairCompatibilityScores(Set<Primer> possibleForwardPrimers, Set<Primer> possibleReversePrimers) {
         HashMap<Primer[], Double> primerPairCompatibilityScores = new HashMap<>();
         for (Primer forwardPrimer : possibleForwardPrimers) {
             for (Primer reversePrimer : possibleReversePrimers) {
-                double compatibilityScore = this.dimerizationScore(forwardPrimer, reversePrimer) + this.meltingTempCompatibilityScore();
-                primerPairCompatibilityScores.put(new Primer[]{forwardPrimer, reversePrimer}, compatibilityScore);
+                primerPairCompatibilityScores.put(new Primer[]{forwardPrimer, reversePrimer}, forwardPrimer.compatibilityScore(reversePrimer));
             }
         }
         return primerPairCompatibilityScores;
-    }
-
-    private double meltingTempCompatibilityScore() {
-        return Math.random();
     }
 
     private Primer[] getMaxScorePair(ArrayList<Primer[]> primerList, HashMap<Primer[], Double> scores) {
