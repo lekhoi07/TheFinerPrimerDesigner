@@ -99,21 +99,22 @@ public class AutomaticPrimerDesigner {
         String seq2 = primer2.getComplement().getReverse().getSequence();
 
         int maxAlignmentScore = 0;
-
-        for (int i = -1 * seq1.length(); i <= seq1.length(); i++) {
-            int numComparisons = seq1.length() - Math.abs(i);
-            for (int j = 0; j < numComparisons; j++) {
-                int alignmentScore = 0;
-                if (seq1.toCharArray()[j] == seq2.toCharArray()[j + i]) {
-                    alignmentScore += 1;
+        for (int i = 0; i < seq1.length() + seq2.length() - 1; i++) {
+            int alignmentScore = 0;
+            for (int j = 0; j < seq1.length(); j++) {
+                int comparisonPosition = seq2.length() - 1 - i + j;
+                if (comparisonPosition >= 0 && comparisonPosition < seq2.length()) {
+                    if (seq1.toCharArray()[j] == seq2.toCharArray()[comparisonPosition]) {
+                        alignmentScore += 1;
+                    }
                 }
-                if (alignmentScore > maxAlignmentScore) {
-                    maxAlignmentScore = alignmentScore;
-                }
+            }
+            if (alignmentScore > maxAlignmentScore) {
+                maxAlignmentScore = alignmentScore;
             }
         }
 
-        return Math.random();
+        return maxAlignmentScore;
     }
 
     private double hairpinScore() {

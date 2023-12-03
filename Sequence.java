@@ -44,7 +44,7 @@ public class Sequence {
     }
 
     public Sequence getReverse() {
-        StringBuilder reverseSequence = new StringBuilder(new Sequence(this.sequence).getComplement().getSequence()).reverse();
+        StringBuilder reverseSequence = new StringBuilder(new Sequence(this.sequence).getSequence()).reverse();
         return new Sequence(reverseSequence.toString());
     }
 
