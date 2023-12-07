@@ -12,10 +12,10 @@ public class TabOrganizer {
     public TabOrganizer() {
         this.root = new TabPane();
         this.root.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        TheFinerPrimerDesigner myDesigner = new TheFinerPrimerDesigner(this.root);
-        Tab inputTab = myDesigner.getInputTab();
-        Tab designTab = myDesigner.getPrimerDesignTab();
-        Tab resultsTab = myDesigner.getResultsTab();
+        Tab inputTab = new Tab("INPUT");
+        Tab designTab = new Tab("DESIGN YOUR PRIMERS");
+        Tab resultsTab = new Tab("MY DESIGNED PRIMERS");
+        new TheFinerPrimerDesigner(this.root, inputTab, designTab, resultsTab);
         this.root.getTabs().addAll(inputTab, designTab, resultsTab);
     }
 

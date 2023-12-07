@@ -92,6 +92,8 @@ public class InputProcessor {
 
     private Sequence processSequence(String sequence) {
         sequence = sequence.replaceAll(" ","");
+        sequence = sequence.replaceAll("\t", "");
+        sequence = sequence.replaceAll("\n", "");
         sequence = "5" + sequence.toLowerCase() + "3";
         return new Sequence(sequence);
     }

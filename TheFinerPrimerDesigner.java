@@ -25,27 +25,17 @@ public class TheFinerPrimerDesigner {
     // TODO: replace later:
     private Label tempResults;
 
-    public TheFinerPrimerDesigner(TabPane tabPane) {
+    public TheFinerPrimerDesigner(TabPane tabPane, Tab inputTab, Tab designTab, Tab resultsTab) {
         this.tabPane = tabPane;
+        this.inputTab = inputTab;
+        this.designTab = designTab;
+        this.resultsTab = resultsTab;
         this.createInputTab();
         this.createDesignTab();
         this.createResultsTab();
     }
 
-    public Tab getInputTab() {
-        return this.inputTab;
-    }
-
-    public Tab getPrimerDesignTab() {
-        return this.designTab;
-    }
-
-    public Tab getResultsTab() {
-        return this.resultsTab;
-    }
-
     private void createInputTab() {
-        this.inputTab = new Tab("INPUT");
         HBox root = new HBox();
         Button button = new Button("Get input");
         button.setOnAction(e -> {
@@ -61,7 +51,6 @@ public class TheFinerPrimerDesigner {
     }
 
     private void createDesignTab() {
-        this.designTab = new Tab("DESIGN YOUR PRIMERS");
         this.designPane = new BorderPane();
         this.displayPane = new ScrollPane();
         this.selectionPane = new GridPane();
@@ -75,10 +64,9 @@ public class TheFinerPrimerDesigner {
 
     private void createResultsTab() {
         this.results = new ArrayList<>();
-        this.resultsTab = new Tab("MY DESIGNED PRIMERS");
         Pane resultsPane = new Pane();
         this.tempResults = new Label("bleh");
-        resultsPane.getChildren().add(tempResults);
+        resultsPane.getChildren().add(this.tempResults);
         this.resultsTab.setContent(resultsPane);
     }
 

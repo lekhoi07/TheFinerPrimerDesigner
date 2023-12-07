@@ -6,7 +6,7 @@ public class Primer extends Sequence {
     }
 
     public double goodnessScore() {
-        return this.gcContentScore() + this.dimerizationScore(this) + this.hairpinScore() + this.gcClampScore();
+        return this.gcContentScore() + this.dimerizationScore(this) + this.hairpinScore() + this.gcClampScore() + this.meltingTempScore();
     }
 
     private double gcContentScore() {
@@ -18,42 +18,41 @@ public class Primer extends Sequence {
     }
 
     public double dimerizationScore(Primer primer2) {
-        String seq1 = this.getSequence();
-        String seq2 = primer2.getComplement().getReverse().getSequence();
-
         int maxAlignmentScore = 0;
-        for (int i = 0; i < seq1.length() + seq2.length() - 1; i++) {
-            int alignmentScore = 0;
-            for (int j = 0; j < seq1.length(); j++) {
-                int comparisonPosition = seq2.length() - 1 - i + j;
-                if (comparisonPosition >= 0 && comparisonPosition < seq2.length()) {
-                    if (seq1.toCharArray()[j] == seq2.toCharArray()[comparisonPosition]) {
-                        alignmentScore += 1;
-                    }
-                }
-            }
+        for (int i = -1 * primer2.getLength(); i < this.getLength() - 1; i++) {
+            int alignmentScore = this.alignmentScore(this, primer2, i);
             if (alignmentScore > maxAlignmentScore) {
                 maxAlignmentScore = alignmentScore;
             }
         }
-
         return maxAlignmentScore;
     }
 
-    private double alignmentScore(String seq1, String seq2) {
-        return 0;
+    private int alignmentScore(Sequence seq1, Sequence seq2, int offset) {
+        int score = 0;
+        for (int j = 0; j < seq1.getLength(); j++) {
+            int comparisonPosition = offset + j;
+            if (comparisonPosition >= 0 && comparisonPosition < seq2.getLength()) {
+                if (seq1.getSequence().toCharArray()[j] == seq2.getComplement().getReverse().getSequence().toCharArray()[comparisonPosition]) {
+                    score += 1;
+                }
+            }
+        }
+        return score;
     }
 
-    // TODO, not correct yet:
     private double hairpinScore() {
         String seq = this.getSequence();
 
         double maxHairpinScore = 0;
         for (int loopLength = 6; loopLength < this.getLength() - 2; loopLength++) {
-            for (int i = 0; i < seq.length() - loopLength - 1; i++) {
-                Primer subseq1 = new Primer(seq.substring(0, i));
-                Primer subseq2 = new Primer(seq.substring(i + loopLength + 1));
-                double currentScore = subseq1.dimerizationScore(subseq2);
+            for (int i = 1; i < seq.length() - loopLength; i++) {
+                String subseq1 = seq.substring(0, i);
+                String subseq2 = seq.substring(i + loopLength);
+                int k = Math.min(subseq1.length(), subseq2.length());
+                subseq1 = subseq1.substring(subseq1.length() - k);
+                subseq2 = subseq2.substring(subseq2.length() - k);
+                double currentScore = this.alignmentScore(new Sequence(subseq1), new Sequence(subseq2), 0);
                 if (currentScore > maxHairpinScore) {
                     maxHairpinScore = currentScore;
                 }
@@ -63,17 +62,30 @@ public class Primer extends Sequence {
         return maxHairpinScore;
     }
 
-    // TODO
     private double gcClampScore() {
-        return Math.random();
+        Sequence clamp = new Sequence(this.getSequence().substring(this.getLength() - 5));
+        if (clamp.getGC_Content() == 0.4 || clamp.getGC_Content() == 0.6) {
+            return 0;
+        } else {
+            return 15;
+        }
+    }
+
+    private double meltingTempScore() {
+        double a = this.getMeltingTemperature() - 52;
+        double b = 58 - this.getMeltingTemperature();
+        if (a >= 0 && b >= 0) {
+            return 0;
+        } else {
+            return Math.min(Math.abs(a), Math.abs(b));
+        }
     }
 
     public double compatibilityScore(Primer primer2) {
         return this.dimerizationScore(primer2) + this.meltingTempCompatibilityScore(primer2);
     }
 
-    // TODO
     private double meltingTempCompatibilityScore(Primer primer2) {
-        return Math.random();
+        return Math.abs(this.getMeltingTemperature() - primer2.getMeltingTemperature());
     }
 }
