@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -15,15 +16,14 @@ public class TheFinerPrimerDesigner {
     private Tab resultsTab;
     private Sequence inputSequence;
     private Sequence selectedSequence;
-    private SequenceDisplayer displayer;
+    private SequenceDisplayer sequenceDisplayer;
     private BorderPane designPane;
     private ScrollPane displayPane;
     private GridPane selectionPane;
     private AutomaticPrimerDesigner automaticDesigner;
     private ArrayList<Primer[]> results;
-
-    // TODO: replace later:
-    private Label tempResults;
+    private BorderPane resultsPaneScrollable;
+    private ResultsDisplayer resultsDisplayer;
 
     public TheFinerPrimerDesigner(TabPane tabPane, Tab inputTab, Tab designTab, Tab resultsTab) {
         this.tabPane = tabPane;
@@ -56,24 +56,26 @@ public class TheFinerPrimerDesigner {
         this.selectionPane = new GridPane();
         this.selectionPane.setStyle("-fx-background-color: #ffffff");
         this.selectionPane.setPrefWidth(200);
-        this.displayer = new SequenceDisplayer(this.designPane);
-        new SequenceSelector(this.selectionPane, this.displayer);
-        this.automaticDesigner = new AutomaticPrimerDesigner(this.selectionPane, this.displayer, this);
+        this.sequenceDisplayer = new SequenceDisplayer(this.designPane);
+        new SequenceSelector(this.selectionPane, this.sequenceDisplayer);
+        this.automaticDesigner = new AutomaticPrimerDesigner(this.selectionPane, this.sequenceDisplayer, this);
         this.designTab.setContent(this.designPane);
     }
 
     private void createResultsTab() {
         this.results = new ArrayList<>();
-        Pane resultsPane = new Pane();
-        this.tempResults = new Label("bleh");
-        resultsPane.getChildren().add(this.tempResults);
+        ScrollPane resultsPane = new ScrollPane();
+        this.resultsPaneScrollable = new BorderPane();
+//        this.resultsPaneScrollable.getChildren().add(new Rectangle(100, 1000));
+        resultsPane.setContent(this.resultsPaneScrollable);
         this.resultsTab.setContent(resultsPane);
+        this.resultsDisplayer =  new ResultsDisplayer(this.resultsPaneScrollable);
     }
 
     public void setSequence(Sequence newSequence) {
         this.inputSequence = newSequence;
-        this.displayer.setDisplayPane(this.displayPane);
-        this.displayer.setInputSequence(newSequence);
+        this.sequenceDisplayer.setDisplayPane(this.displayPane);
+        this.sequenceDisplayer.setInputSequence(newSequence);
         this.automaticDesigner.setInputSequence(newSequence);
         this.tabPane.getSelectionModel().select(this.designTab);
         this.displayPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -81,17 +83,13 @@ public class TheFinerPrimerDesigner {
         this.designPane.setRight(this.selectionPane);
     }
 
-    public void setResults(ArrayList<Primer[]> newResults) {
+    public void setResults(ArrayList<Primer[]> newResults, boolean deletePrevious) {
+        if (deletePrevious) {
+            this.results = new ArrayList<>();
+        }
         this.tabPane.getSelectionModel().select(this.resultsTab);
         this.results.addAll(newResults);
-
-        StringBuilder tmpText = new StringBuilder();
-        for (Primer[] pair : this.results) {
-            for (Primer p : pair) {
-                tmpText = tmpText.append(p.getSequence());
-                tmpText.append("\n");
-            }
-        }
-        this.tempResults.setText(tmpText.toString());
+        this.resultsDisplayer.setResults(this.results);
+        this.resultsDisplayer.displayResults();
     }
 }

@@ -1,6 +1,8 @@
 package indy;
 
 public class Primer extends Sequence {
+    private int[] position;
+
     public Primer(String sequence) {
         super(sequence);
     }
@@ -87,5 +89,13 @@ public class Primer extends Sequence {
 
     private double meltingTempCompatibilityScore(Primer primer2) {
         return Math.abs(this.getMeltingTemperature() - primer2.getMeltingTemperature());
+    }
+
+    public void setPosition(int[] position) {
+        this.position = position;
+    }
+
+    public int[] getPosition() {
+        return this.position;
     }
 }

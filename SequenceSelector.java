@@ -63,7 +63,7 @@ public class SequenceSelector {
         try {
             int startIndex = Integer.parseInt(startInput);
             int endIndex = Integer.parseInt(endInput);
-            if (startIndex > 0 && endIndex < this.displayer.getInputSequenceLength() - 1) {
+            if (startIndex > 0 && endIndex < this.displayer.getInputSequenceLength() - 1 && startIndex <= endIndex) {
                 for (GraphicalNucleotide nucleotide : this.displayer.getGraphicalSequence()) {
                     if (nucleotide.getPosition() < startIndex || nucleotide.getPosition() > endIndex) {
                         nucleotide.setFill(Color.WHITE);

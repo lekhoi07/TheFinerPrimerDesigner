@@ -32,7 +32,7 @@ public class AutomaticPrimerDesigner {
         ArrayList<Primer> possibleForwardPrimers = this.generatePossiblePrimers(forwardPrimerRegion, true);
         ArrayList<Primer> possibleReversePrimers = this.generatePossiblePrimers(reversePrimerRegion, false);
         if (possibleForwardPrimers.isEmpty() || possibleReversePrimers.isEmpty()) {
-            this.designer.setResults(new ArrayList<>());
+            this.designer.setResults(new ArrayList<>(), false);
             return;
         }
 
@@ -59,7 +59,7 @@ public class AutomaticPrimerDesigner {
             }
         }
 
-        this.designer.setResults(top10PrimerPairs);
+        this.designer.setResults(top10PrimerPairs, false);
     }
 
     private ArrayList<Primer> generatePossiblePrimers(Sequence region, boolean isForwardPrimers) {
@@ -70,9 +70,13 @@ public class AutomaticPrimerDesigner {
 
         for (int i = 0; i < region.getLength() - 19; i++) {
             if (isForwardPrimers) {
-                possiblePrimers.add(new Primer(region.getSequence().substring(i, i + 20)));
+                Primer forwardPrimer = new Primer(region.getSequence().substring(i, i + 20));
+                forwardPrimer.setPosition(new int[]{i + 1, i + 20});
+                possiblePrimers.add(forwardPrimer);
             } else {
-                possiblePrimers.add(new ReversePrimer(region.getSequence().substring(i, i + 20)));
+                Primer reversePrimer = new ReversePrimer(region.getSequence().substring(i, i + 20));
+                reversePrimer.setPosition(new int[]{this.inputSequence.getLength() - region.getLength() + i - 1, this.inputSequence.getLength() - region.getLength() + i + 18});
+                possiblePrimers.add(reversePrimer);
             }
         }
         return possiblePrimers;
