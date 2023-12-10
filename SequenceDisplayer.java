@@ -17,6 +17,7 @@ public class SequenceDisplayer {
     private ArrayList<GraphicalNucleotide> graphicalSequence;
     private ScrollPane displayPane;
     private Pane displayPaneScrollable;
+    private SequenceSelector selector;
 
     public SequenceDisplayer(BorderPane root) {
         this.root = root;
@@ -50,7 +51,7 @@ public class SequenceDisplayer {
         } else {
             this.root.getChildren().remove(this.nothingDisplayedPane);
             for (int i = 0; i < this.inputSequence.getLength(); i++) {
-                this.graphicalSequence.add(new GraphicalNucleotide(new Sequence("" + this.inputSequence.getSequence().toCharArray()[i]), i, this.displayPaneScrollable, this));
+                this.graphicalSequence.add(new GraphicalNucleotide(new Sequence("" + this.inputSequence.getSequence().toCharArray()[i]), i, this.displayPaneScrollable, this, true, 0, true));
             }
             this.makeStartLabel();
             this.makeEndLabel();
@@ -91,16 +92,16 @@ public class SequenceDisplayer {
         if (!isContinuous) {
             if (this.graphicalSequence.get(selectedPosition).getFill() == Color.VIOLET) {
                 for (int i = colorChangePositions[1]; i < colorChangePositions[2]; i++) {
-                    this.graphicalSequence.get(i).setFill(Color.VIOLET);
+                    this.graphicalSequence.get(i).setFill(Color.VIOLET, 1);
                 }
             } else {
                 if (colorChangePositions[1] - colorChangePositions[0] < colorChangePositions[3] - colorChangePositions[2]) {
                     for (int i = colorChangePositions[0]; i < colorChangePositions[1]; i++) {
-                        this.graphicalSequence.get(i).setFill(Color.WHITE);
+                        this.graphicalSequence.get(i).setFill(Color.WHITE, 1);
                     }
                 } else {
                     for (int i = colorChangePositions[2]; i < colorChangePositions[3]; i++) {
-                        this.graphicalSequence.get(i).setFill(Color.WHITE);
+                        this.graphicalSequence.get(i).setFill(Color.WHITE, 1);
                     }
                 }
             }
@@ -122,6 +123,25 @@ public class SequenceDisplayer {
                 colorChangePositions[colorChanges - 1] = nucleotide.getPosition();
             }
         }
+        if (colorChanges == 0) {
+            return null;
+        }
         return colorChangePositions;
+    }
+
+    public void setSelector(SequenceSelector selector) {
+        this.selector = selector;
+    }
+
+    public void setSelectionText() {
+        this.selector.setText(this.getSelectedRegion());
+    }
+
+    public Sequence getInputSequence() {
+        return this.inputSequence;
+    }
+
+    public Pane getDisplayPaneScrollable() {
+        return this.displayPaneScrollable;
     }
 }

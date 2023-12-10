@@ -1,31 +1,29 @@
 package indy;
 
 import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
 public class SequenceSelector {
     private GridPane root;
     private SequenceDisplayer displayer;
+    private TextField startIndexTextbox;
+    private TextField endIndexTextbox;
+    private Label gcContent, meltingTemp, length;
 
     public SequenceSelector(GridPane root, SequenceDisplayer displayer) {
         this.root = root;
         this.displayer = displayer;
+        this.displayer.setSelector(this);
         this.setUpGUI();
     }
 
     private void setUpGUI() {
-        Label selectRegion = new Label("SELECT REGION");
-        selectRegion.setTranslateX(55);
+        Label selectRegion = new Label("1. SELECT REGION");
+        selectRegion.setTranslateX(50);
         selectRegion.setTranslateY(50);
 
         Label startIndex = new Label("Start Index:");
@@ -36,22 +34,38 @@ public class SequenceSelector {
         endIndex.setTranslateX(10);
         endIndex.setTranslateY(150);
 
-        TextField startIndexTextbox = new TextField();
-        startIndexTextbox.setTranslateX(80);
-        startIndexTextbox.setTranslateY(100);
-        startIndexTextbox.setMaxWidth(100);
+        this.startIndexTextbox = new TextField();
+        this.startIndexTextbox.setTranslateX(80);
+        this.startIndexTextbox.setTranslateY(100);
+        this.startIndexTextbox.setMaxWidth(100);
 
-        TextField endIndexTextbox = new TextField();
-        endIndexTextbox.setTranslateX(80);
-        endIndexTextbox.setTranslateY(150);
-        endIndexTextbox.setMaxWidth(100);
+        this.endIndexTextbox = new TextField();
+        this.endIndexTextbox.setTranslateX(80);
+        this.endIndexTextbox.setTranslateY(150);
+        this.endIndexTextbox.setMaxWidth(100);
 
         Button selectButton = new Button("SELECT");
         selectButton.setTranslateX(70);
         selectButton.setTranslateY(200);
-        selectButton.setOnAction((ActionEvent e) -> this.selectRegion(startIndexTextbox, endIndexTextbox));
+        selectButton.setOnAction((ActionEvent e) -> this.selectRegion(this.startIndexTextbox, this.endIndexTextbox));
 
-        this.root.getChildren().addAll(selectRegion, startIndex, endIndex, startIndexTextbox, endIndexTextbox, selectButton);
+        this.gcContent = new Label("GC%: N/A");
+        this.gcContent.setTranslateX(10);
+        this.gcContent.setTranslateY(250);
+
+        this.meltingTemp = new Label("Melting Temperature: N/A");
+        this.meltingTemp.setTranslateX(10);
+        this.meltingTemp.setTranslateY(267);
+
+        this.length = new Label("Length: N/A");
+        this.length.setTranslateX(10);
+        this.length.setTranslateY(284);
+
+        Label designPrimers = new Label("2. DESIGN PRIMERS");
+        designPrimers.setTranslateX(50);
+        designPrimers.setTranslateY(325);
+
+        this.root.getChildren().addAll(selectRegion, startIndex, endIndex, this.startIndexTextbox, this.endIndexTextbox, selectButton, this.gcContent, this.meltingTemp, this.length, designPrimers);
     }
 
     private void selectRegion(TextField start, TextField end) {
@@ -66,16 +80,33 @@ public class SequenceSelector {
             if (startIndex > 0 && endIndex < this.displayer.getInputSequenceLength() - 1 && startIndex <= endIndex) {
                 for (GraphicalNucleotide nucleotide : this.displayer.getGraphicalSequence()) {
                     if (nucleotide.getPosition() < startIndex || nucleotide.getPosition() > endIndex) {
-                        nucleotide.setFill(Color.WHITE);
+                        nucleotide.setFill(Color.WHITE, 1);
                     } else {
-                        nucleotide.setFill(Color.VIOLET);
+                        nucleotide.setFill(Color.VIOLET, 1);
                     }
                 }
+                this.setText(this.displayer.getSelectedRegion());
             } else {
                 new ErrorMessage("Inputs out of bounds");
             }
         } catch (NumberFormatException e) {
             new ErrorMessage("Inputs must be integers");
+        }
+    }
+
+    public void setText(int[] selectedRegion) {
+        if (selectedRegion == null) {
+            this.startIndexTextbox.clear();
+            this.endIndexTextbox.clear();
+            this.gcContent.setText("GC%: N/A");
+            this.meltingTemp.setText("Melting Temp.: N/A");
+            this.length.setText("Length: N/A");
+        } else {
+            this.startIndexTextbox.setText("" + selectedRegion[0]);
+            this.endIndexTextbox.setText("" + (selectedRegion[1] - 1));
+            this.gcContent.setText("GC%: " + new Sequence(this.displayer.getInputSequence().getSequence().substring(selectedRegion[0], selectedRegion[1])).getGC_Content() * 100 + "%");
+            this.meltingTemp.setText("Melting Temp.: " + new Sequence(this.displayer.getInputSequence().getSequence().substring(selectedRegion[0], selectedRegion[1])).getMeltingTemperature() + " degrees C");
+            this.length.setText("Length: " + this.displayer.getInputSequence().getSequence().substring(selectedRegion[0], selectedRegion[1]).length() + " bp");
         }
     }
 }

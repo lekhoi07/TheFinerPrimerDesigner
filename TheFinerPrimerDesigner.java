@@ -18,11 +18,11 @@ public class TheFinerPrimerDesigner {
     private Sequence selectedSequence;
     private SequenceDisplayer sequenceDisplayer;
     private BorderPane designPane;
-    private ScrollPane displayPane;
+    private ScrollPane displayPane, resultsPane;
     private GridPane selectionPane;
     private AutomaticPrimerDesigner automaticDesigner;
-    private ArrayList<Primer[]> results;
-    private BorderPane resultsPaneScrollable;
+    private ArrayList<GraphicalPrimerPair> results;
+    private Pane resultsPaneScrollable;
     private ResultsDisplayer resultsDisplayer;
 
     public TheFinerPrimerDesigner(TabPane tabPane, Tab inputTab, Tab designTab, Tab resultsTab) {
@@ -59,37 +59,43 @@ public class TheFinerPrimerDesigner {
         this.sequenceDisplayer = new SequenceDisplayer(this.designPane);
         new SequenceSelector(this.selectionPane, this.sequenceDisplayer);
         this.automaticDesigner = new AutomaticPrimerDesigner(this.selectionPane, this.sequenceDisplayer, this);
+        new ManualPrimerDesigner(this.selectionPane, this.sequenceDisplayer, this);
         this.designTab.setContent(this.designPane);
     }
 
     private void createResultsTab() {
         this.results = new ArrayList<>();
-        ScrollPane resultsPane = new ScrollPane();
-        this.resultsPaneScrollable = new BorderPane();
-//        this.resultsPaneScrollable.getChildren().add(new Rectangle(100, 1000));
-        resultsPane.setContent(this.resultsPaneScrollable);
-        this.resultsTab.setContent(resultsPane);
+        this.resultsPane = new ScrollPane();
+        this.resultsPaneScrollable = new Pane();
         this.resultsDisplayer =  new ResultsDisplayer(this.resultsPaneScrollable);
+        this.resultsPane.setContent(this.resultsPaneScrollable);
+        this.resultsTab.setContent(this.resultsPane);
     }
 
     public void setSequence(Sequence newSequence) {
+        if (!this.results.isEmpty()) {
+            this.setResults(new ArrayList<>(), true);
+
+        }
         this.inputSequence = newSequence;
         this.sequenceDisplayer.setDisplayPane(this.displayPane);
         this.sequenceDisplayer.setInputSequence(newSequence);
         this.automaticDesigner.setInputSequence(newSequence);
         this.tabPane.getSelectionModel().select(this.designTab);
-        this.displayPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        this.displayPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         this.designPane.setCenter(this.displayPane);
         this.designPane.setRight(this.selectionPane);
     }
 
-    public void setResults(ArrayList<Primer[]> newResults, boolean deletePrevious) {
+    public void setResults(ArrayList<GraphicalPrimerPair> newResults, boolean deletePrevious) {
         if (deletePrevious) {
-            this.results = new ArrayList<>();
+            this.results = newResults;
+            this.resultsDisplayer.setResults(newResults);
+            return;
         }
-        this.tabPane.getSelectionModel().select(this.resultsTab);
         this.results.addAll(newResults);
         this.resultsDisplayer.setResults(this.results);
-        this.resultsDisplayer.displayResults();
+        this.resultsPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        this.tabPane.getSelectionModel().select(this.resultsTab);
     }
 }

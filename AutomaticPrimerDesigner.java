@@ -3,6 +3,8 @@ package indy;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.TextAlignment;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -12,27 +14,36 @@ public class AutomaticPrimerDesigner {
     private Sequence inputSequence;
     private SequenceDisplayer displayer;
     private TheFinerPrimerDesigner designer;
+    private Pane scrollPane;
 
     public AutomaticPrimerDesigner(GridPane root, SequenceDisplayer displayer, TheFinerPrimerDesigner designer) {
         this.displayer = displayer;
         this.designer = designer;
 
-        Button generatePrimers = new Button("GENERATE PRIMERS");
-        generatePrimers.setTranslateX(35);
-        generatePrimers.setTranslateY(250);
+        Button generatePrimers = new Button("GENERATE PRIMERS FOR SELECTION AS AMPLICON");
+        generatePrimers.setWrapText(true);
+        generatePrimers.setTextAlignment(TextAlignment.CENTER);
+        generatePrimers.setMaxWidth(150);
+        generatePrimers.setTranslateX(25);
+        generatePrimers.setTranslateY(375);
         generatePrimers.setOnAction((ActionEvent e) -> this.generatePrimers());
         root.getChildren().add(generatePrimers);
     }
 
     private void generatePrimers() {
         int[] amplicon = this.displayer.getSelectedRegion();
+        if (amplicon == null) {
+            new ErrorMessage("No amplicon selected");
+            return;
+        }
+
         Sequence forwardPrimerRegion = new Sequence(this.inputSequence.getSequence().substring(1, amplicon[0]));
         Sequence reversePrimerRegion = new Sequence(this.inputSequence.getSequence().substring(amplicon[1], this.inputSequence.getLength() - 1));
 
         ArrayList<Primer> possibleForwardPrimers = this.generatePossiblePrimers(forwardPrimerRegion, true);
         ArrayList<Primer> possibleReversePrimers = this.generatePossiblePrimers(reversePrimerRegion, false);
         if (possibleForwardPrimers.isEmpty() || possibleReversePrimers.isEmpty()) {
-            this.designer.setResults(new ArrayList<>(), false);
+            new ErrorMessage("No possible primers");
             return;
         }
 
@@ -58,8 +69,15 @@ public class AutomaticPrimerDesigner {
                 }
             }
         }
+        ArrayList<GraphicalPrimerPair> results = new ArrayList<>();
+        for (Primer[] primerPair : top10PrimerPairs) {
+            GraphicalPrimerPair graphicalPrimerPair = new GraphicalPrimerPair(primerPair);
+            results.add(graphicalPrimerPair);
+            graphicalPrimerPair.setGraphicalForwardPrimer(new GraphicalPrimer(primerPair[0], primerPair[0].getPosition()[0], this.displayer.getDisplayPaneScrollable(), this.displayer, true));
+            graphicalPrimerPair.setGraphicalReversePrimer(new GraphicalPrimer(primerPair[1], primerPair[1].getPosition()[0], this.displayer.getDisplayPaneScrollable(), this.displayer, false));
+        }
+        this.designer.setResults(results, false);
 
-        this.designer.setResults(top10PrimerPairs, false);
     }
 
     private ArrayList<Primer> generatePossiblePrimers(Sequence region, boolean isForwardPrimers) {
