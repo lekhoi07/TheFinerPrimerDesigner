@@ -73,7 +73,11 @@ public class ManualPrimerDesigner {
     private void createPrimerPair() {
         if (this.forwardPrimerMade && this.reversePrimerMade) {
             ArrayList<GraphicalPrimerPair> manuallyDesignedPair = new ArrayList<>();
-            manuallyDesignedPair.add(new GraphicalPrimerPair(new Primer[]{this.forwardPrimer, this.reversePrimer}));
+            Primer[] manualPair = new Primer[]{this.forwardPrimer, this.reversePrimer};
+            GraphicalPrimerPair graphicalManualPair = new GraphicalPrimerPair(manualPair, this.forwardPrimer.compatibilityScore(this.reversePrimer), this.designer);
+            graphicalManualPair.setGraphicalForwardPrimer(this.graphicalForwardPrimer);
+            graphicalManualPair.setGraphicalReversePrimer(this.graphicalReversePrimer);
+            manuallyDesignedPair.add(graphicalManualPair);
             this.designer.setResults(manuallyDesignedPair, false);
             this.forwardPrimerMade = false;
             this.reversePrimerMade = false;

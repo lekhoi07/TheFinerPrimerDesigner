@@ -37,7 +37,7 @@ public class TheFinerPrimerDesigner {
 
     private void createInputTab() {
         HBox root = new HBox();
-        Button button = new Button("Get input");
+        Button button = new Button("INPUT DNA SEQUENCE");
         button.setOnAction(e -> {
             Stage inputStage = new Stage();
             inputStage.setTitle("INPUT YOUR DNA SEQUENCE 5' TO 3'");
@@ -97,5 +97,9 @@ public class TheFinerPrimerDesigner {
         this.resultsDisplayer.setResults(this.results);
         this.resultsPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         this.tabPane.getSelectionModel().select(this.resultsTab);
+    }
+
+    public ArrayList<GraphicalPrimerPair> getResults() {
+        return this.results;
     }
 }

@@ -71,7 +71,7 @@ public class AutomaticPrimerDesigner {
         }
         ArrayList<GraphicalPrimerPair> results = new ArrayList<>();
         for (Primer[] primerPair : top10PrimerPairs) {
-            GraphicalPrimerPair graphicalPrimerPair = new GraphicalPrimerPair(primerPair);
+            GraphicalPrimerPair graphicalPrimerPair = new GraphicalPrimerPair(primerPair, overallPrimerPairScores.get(primerPair), this.designer);
             results.add(graphicalPrimerPair);
             graphicalPrimerPair.setGraphicalForwardPrimer(new GraphicalPrimer(primerPair[0], primerPair[0].getPosition()[0], this.displayer.getDisplayPaneScrollable(), this.displayer, true));
             graphicalPrimerPair.setGraphicalReversePrimer(new GraphicalPrimer(primerPair[1], primerPair[1].getPosition()[0], this.displayer.getDisplayPaneScrollable(), this.displayer, false));
@@ -82,19 +82,20 @@ public class AutomaticPrimerDesigner {
 
     private ArrayList<Primer> generatePossiblePrimers(Sequence region, boolean isForwardPrimers) {
         ArrayList<Primer> possiblePrimers = new ArrayList<>();
-        if (region.getLength() < 20) {
+        if (region.getLength() < 18) {
             return possiblePrimers;
         }
-
-        for (int i = 0; i < region.getLength() - 19; i++) {
-            if (isForwardPrimers) {
-                Primer forwardPrimer = new Primer(region.getSequence().substring(i, i + 20));
-                forwardPrimer.setPosition(new int[]{i + 1, i + 20});
-                possiblePrimers.add(forwardPrimer);
-            } else {
-                Primer reversePrimer = new ReversePrimer(region.getSequence().substring(i, i + 20));
-                reversePrimer.setPosition(new int[]{this.inputSequence.getLength() - region.getLength() + i - 1, this.inputSequence.getLength() - region.getLength() + i + 18});
-                possiblePrimers.add(reversePrimer);
+        for (int primerLength = 18; primerLength < 25; primerLength++) {
+            for (int i = 0; i < region.getLength() - primerLength + 1; i++) {
+                if (isForwardPrimers) {
+                    Primer forwardPrimer = new Primer(region.getSequence().substring(i, i + primerLength));
+                    forwardPrimer.setPosition(new int[]{i + 1, i + primerLength});
+                    possiblePrimers.add(forwardPrimer);
+                } else {
+                    Primer reversePrimer = new ReversePrimer(region.getSequence().substring(i, i + primerLength));
+                    reversePrimer.setPosition(new int[]{this.inputSequence.getLength() - region.getLength() + i - 1, this.inputSequence.getLength() - region.getLength() + i + primerLength - 2});
+                    possiblePrimers.add(reversePrimer);
+                }
             }
         }
         return possiblePrimers;

@@ -32,7 +32,7 @@ public class GraphicalNucleotide {
 
     private int[] calcDisplayCoordinates(int position) {
         int posX = 30 + 10 * (position % 42);
-        int posY = this.offset + 100 + 120 * (position / 42);
+        int posY = this.offset + 100 + 110 * (position / 42);
         return new int[]{posX, posY};
     }
 
@@ -102,5 +102,13 @@ public class GraphicalNucleotide {
 
      public int getPosition() {
         return this.position;
+     }
+
+     public void show() {
+        this.root.getChildren().add(this.nucleotidePane);
+     }
+
+     public void hide() {
+        this.root.getChildren().remove(this.nucleotidePane);
      }
 }

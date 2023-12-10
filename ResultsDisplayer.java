@@ -43,7 +43,7 @@ public class ResultsDisplayer {
                 this.resultsPaneScrollable.getChildren().remove(pair.getPrimerPairPane());
                 pair.setPosition(position);
                 pair.setRoot(this.resultsPaneScrollable);
-                pair.displayGraphicalPrimerPair();
+                pair.displayGraphicalPrimerPair(position);
                 position += 1;
             }
         }
