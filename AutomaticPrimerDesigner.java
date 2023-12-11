@@ -119,14 +119,32 @@ public class AutomaticPrimerDesigner {
                 }
             }
         }
+
         return possiblePrimers;
     }
 
     private HashMap<Primer, Double> calculatePrimerScores(ArrayList<Primer> primerList) {
         HashMap<Primer, Double> primerScores = new HashMap<>();
+        double runningScoreTotal = 0;
         for (Primer primer : primerList) {
-            primerScores.put(primer, primer.goodnessScore());
+            double score = primer.goodnessScore();
+            primerScores.put(primer, score);
+            runningScoreTotal += score;
         }
+
+        ArrayList<Primer> toBeRemoved = new ArrayList<>();
+        double averageScore = runningScoreTotal / primerScores.size();
+        if (primerScores.size() > 20) {
+            for (Primer primer : primerScores.keySet()) {
+                if (primerScores.get(primer) < averageScore) {
+                    toBeRemoved.add(primer);
+                }
+            }
+            for (Primer primer : toBeRemoved) {
+                primerScores.remove(primer);
+            }
+        }
+
         return primerScores;
     }
 
