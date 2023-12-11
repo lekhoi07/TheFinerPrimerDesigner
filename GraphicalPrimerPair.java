@@ -1,5 +1,7 @@
 package indy;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,6 +16,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -142,6 +145,7 @@ public class GraphicalPrimerPair {
         propertyPane.setTop(info);
         propertyPane.setBottom(quitButtonPane);
         propertyStage.setScene(new Scene(propertyPane));
+        propertyStage.setTitle("COMPLETE PRIMER PAIR INFORMATION");
         propertyStage.show();
 
         info.setText(
@@ -164,10 +168,18 @@ public class GraphicalPrimerPair {
     }
 
     private void removePrimerPair() {
-        this.graphicalForwardPrimer.hide();
-        this.graphicalReversePrimer.hide();
-        ArrayList<GraphicalPrimerPair> newResults = new ArrayList<>(this.designer.getResults());
-        newResults.remove(this);
-        this.designer.setResults(newResults, true);
+        WarningMessage warning = new WarningMessage("Are you sure you want to delete this primer pair? This action cannot be undone.");
+        warning.getContinueButton().setOnAction((ActionEvent e) -> {
+            warning.getWarningStage().close();
+            this.graphicalForwardPrimer.hide();
+            this.graphicalReversePrimer.hide();
+            ArrayList<GraphicalPrimerPair> newResults = new ArrayList<>(this.designer.getResults());
+            newResults.remove(this);
+            KeyFrame kf = new KeyFrame(Duration.seconds(0.1), (ActionEvent f) -> this.primerPairPane.setOpacity(this.primerPairPane.getOpacity() * .75));
+            Timeline fadingAnimation = new Timeline(kf);
+            fadingAnimation.setCycleCount(5);
+            fadingAnimation.play();
+            fadingAnimation.setOnFinished((ActionEvent f) -> this.designer.setResults(newResults, true));
+        });
     }
 }

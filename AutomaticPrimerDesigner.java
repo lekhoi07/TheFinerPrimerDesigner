@@ -1,8 +1,11 @@
 package indy;
 
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextAlignment;
 
@@ -15,19 +18,30 @@ public class AutomaticPrimerDesigner {
     private SequenceDisplayer displayer;
     private TheFinerPrimerDesigner designer;
     private Pane scrollPane;
+    private GridPane root;
 
     public AutomaticPrimerDesigner(GridPane root, SequenceDisplayer displayer, TheFinerPrimerDesigner designer) {
+        this.root = root;
         this.displayer = displayer;
         this.designer = designer;
+        this.setUpGUI();
+    }
+
+    private void setUpGUI() {
+        HBox automaticPane = new HBox();
+        Label automatic = new Label("Automatic");
+        automaticPane.setTranslateX(73);
+        automaticPane.setTranslateY(375);
+        automaticPane.getChildren().add(automatic);
 
         Button generatePrimers = new Button("GENERATE PRIMERS FOR SELECTION AS AMPLICON");
         generatePrimers.setWrapText(true);
         generatePrimers.setTextAlignment(TextAlignment.CENTER);
         generatePrimers.setMaxWidth(150);
         generatePrimers.setTranslateX(25);
-        generatePrimers.setTranslateY(375);
+        generatePrimers.setTranslateY(405);
         generatePrimers.setOnAction((ActionEvent e) -> this.generatePrimers());
-        root.getChildren().add(generatePrimers);
+        this.root.getChildren().addAll(automaticPane, generatePrimers);
     }
 
     private void generatePrimers() {

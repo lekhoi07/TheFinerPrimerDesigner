@@ -74,6 +74,14 @@ public class SequenceSelector {
         String endInput = end.getText().replaceAll(" ", "");
         endInput = endInput.replaceAll("\n", "");
 
+        if (startInput.isEmpty() && endInput.isEmpty()) {
+            for (GraphicalNucleotide nucleotide : this.displayer.getGraphicalSequence()) {
+                nucleotide.setFill(Color.WHITE, 1);
+            }
+            this.setText(null);
+            return;
+        }
+
         try {
             int startIndex = Integer.parseInt(startInput);
             int endIndex = Integer.parseInt(endInput);

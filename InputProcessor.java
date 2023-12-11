@@ -53,7 +53,7 @@ public class InputProcessor {
             if (this.isValidSequence(textArea.getText())) {
                 this.inputSequence = this.processSequence(textArea.getText());
                 if (this.inputSequence.getSequence().length() > 38) {
-                    this.designer.setSequence(this.inputSequence);
+                    this.designer.setInputSequence(this.inputSequence);
                     this.stage.close();
                 } else {
                     new ErrorMessage("Input sequence too short");

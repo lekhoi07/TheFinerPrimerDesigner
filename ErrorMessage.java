@@ -13,6 +13,7 @@ public class ErrorMessage {
     public ErrorMessage(String message) {
         Stage errorStage = new Stage();
         errorStage.setScene(new Scene(this.createErrorPane(errorStage, message)));
+        errorStage.setTitle("ERROR");
         errorStage.show();
     }
     private BorderPane createErrorPane(Stage errorStage, String message) {
