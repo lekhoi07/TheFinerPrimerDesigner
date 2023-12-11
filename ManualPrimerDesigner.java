@@ -56,38 +56,76 @@ public class ManualPrimerDesigner {
     }
 
     private void makeForwardPrimer() {
-        if (this.displayer.getSelectedRegion() == null) {
-            new ErrorMessage("No region selected.");
+        if (this.forwardPrimerMade) {
+            this.displayError("You have an unfinished primer pair consisting of only a forward primer. Create a corresponding reverse primer before proceeding.");
             return;
         }
 
-        if (!this.forwardPrimerMade) {
-            this.forwardPrimer = new Primer(this.displayer.getInputSequence().getSequence().substring(this.displayer.getSelectedRegion()[0], this.displayer.getSelectedRegion()[1]));
-            this.forwardPrimer.setPosition(new int[]{this.displayer.getSelectedRegion()[0], this.displayer.getSelectedRegion()[1] - 1});
-            this.forwardPrimerMade = true;
-            this.graphicalForwardPrimer = new GraphicalPrimer(this.forwardPrimer, this.displayer.getSelectedRegion()[0], this.displayer.getDisplayPaneScrollable(), this.displayer, true);
-        } else {
-            new ErrorMessage("You have an unfinished primer pair consisting of only a forward primer. Create a corresponding reverse primer before proceeding.");
+        if (this.displayer.getSelectedRegion() == null) {
+            this.displayError("No region selected.");
             return;
         }
+
+        if (this.reversePrimer != null) {
+            int ampliconLength = this.reversePrimer.getPosition()[0] - this.displayer.getSelectedRegion()[1];
+            if (ampliconLength <= -1) {
+                this.displayError("Forward primer must be upstream of the reverse primer.");
+                return;
+            }
+            if (ampliconLength == 0) {
+                this.displayError("Amplicon can not be 0 bp long.");
+                return;
+            }
+        }
+
+        this.forwardPrimer = new Primer(this.displayer.getInputSequence().getSequence().substring(this.displayer.getSelectedRegion()[0], this.displayer.getSelectedRegion()[1]));
+
+        if (this.forwardPrimer.getLength() < 18 || this.forwardPrimer.getLength() > 24) {
+            this.displayError("Primers must be 18-24 bp long.");
+            this.forwardPrimer = null;
+            return;
+        }
+
+        this.forwardPrimer.setPosition(new int[]{this.displayer.getSelectedRegion()[0], this.displayer.getSelectedRegion()[1] - 1});
+        this.forwardPrimerMade = true;
+        this.graphicalForwardPrimer = new GraphicalPrimer(this.forwardPrimer, this.displayer.getSelectedRegion()[0], this.displayer.getDisplayPaneScrollable(), this.displayer, true);
         this.createPrimerPair();
     }
 
     private void makeReversePrimer() {
-        if (this.displayer.getSelectedRegion() == null) {
-            new ErrorMessage("No region selected.");
+        if (this.reversePrimerMade) {
+            this.displayError("You have an unfinished primer pair consisting of only a reverse primer. Create a corresponding forward primer before proceeding.");
             return;
         }
 
-        if (!this.reversePrimerMade) {
-            this.reversePrimer = new ReversePrimer(this.displayer.getInputSequence().getSequence().substring(this.displayer.getSelectedRegion()[0], this.displayer.getSelectedRegion()[1]));
-            this.reversePrimer.setPosition(new int[]{this.displayer.getSelectedRegion()[0], this.displayer.getSelectedRegion()[1] - 1});
-            this.reversePrimerMade = true;
-            this.graphicalReversePrimer = new GraphicalPrimer(this.reversePrimer, this.displayer.getSelectedRegion()[0], this.displayer.getDisplayPaneScrollable(), this.displayer, false);
-        } else {
-            new ErrorMessage("You have an unfinished primer pair consisting of only a reverse primer. Create a corresponding forward primer before proceeding.");
+        if (this.displayer.getSelectedRegion() == null) {
+            this.displayError("No region selected.");
             return;
         }
+
+        if (this.forwardPrimer != null) {
+            int ampliconLength = this.displayer.getSelectedRegion()[0] - this.forwardPrimer.getPosition()[1] - 1;
+            if (ampliconLength <= -1) {
+                this.displayError("Reverse primer must be downstream of the forward primer.");
+                return;
+            }
+            if (ampliconLength == 0) {
+                this.displayError("Amplicon can not be 0 bp long.");
+                return;
+            }
+        }
+
+        this.reversePrimer = new ReversePrimer(this.displayer.getInputSequence().getSequence().substring(this.displayer.getSelectedRegion()[0], this.displayer.getSelectedRegion()[1]));
+
+        if (this.reversePrimer.getLength() < 18 || this.reversePrimer.getLength() > 24) {
+            this.displayError("Primers must be 18-24 bp long.");
+            this.reversePrimer = null;
+            return;
+        }
+
+        this.reversePrimer.setPosition(new int[]{this.displayer.getSelectedRegion()[0], this.displayer.getSelectedRegion()[1] - 1});
+        this.reversePrimerMade = true;
+        this.graphicalReversePrimer = new GraphicalPrimer(this.reversePrimer, this.displayer.getSelectedRegion()[0], this.displayer.getDisplayPaneScrollable(), this.displayer, false);
         this.createPrimerPair();
     }
 
@@ -100,8 +138,29 @@ public class ManualPrimerDesigner {
             graphicalManualPair.setGraphicalReversePrimer(this.graphicalReversePrimer);
             manuallyDesignedPair.add(graphicalManualPair);
             this.designer.setResults(manuallyDesignedPair, false);
+            this.forwardPrimer = null;
+            this.reversePrimer = null;
             this.forwardPrimerMade = false;
             this.reversePrimerMade = false;
         }
+    }
+
+    private void displayError(String message) {
+        ManualPrimerDesignError error = new ManualPrimerDesignError(message);
+        error.getAbortButton().setOnAction((ActionEvent e) -> {
+            if (this.graphicalForwardPrimer != null) {
+                this.graphicalForwardPrimer.hide();
+            }
+            if (this.graphicalReversePrimer != null) {
+                this.graphicalReversePrimer.hide();
+            }
+            this.graphicalForwardPrimer = null;
+            this.graphicalReversePrimer = null;
+            this.forwardPrimer = null;
+            this.reversePrimer = null;
+            this.forwardPrimerMade = false;
+            this.reversePrimerMade = false;
+            error.getErrorStage().close();
+        });
     }
 }

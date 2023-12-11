@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextAlignment;
 
+import javax.swing.*;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -40,7 +41,13 @@ public class AutomaticPrimerDesigner {
         generatePrimers.setMaxWidth(150);
         generatePrimers.setTranslateX(25);
         generatePrimers.setTranslateY(405);
-        generatePrimers.setOnAction((ActionEvent e) -> this.generatePrimers());
+        generatePrimers.setOnAction((ActionEvent e) -> {
+            WarningMessage warning = new WarningMessage("The automatic primer designer is a computationally taxing algorithm that takes a lot of time to run, especially for longer template sequences. Do you wish to proceed?");
+            warning.getContinueButton().setOnAction((ActionEvent f) -> {
+                this.generatePrimers();
+                warning.getWarningStage().close();
+            });
+        });
         this.root.getChildren().addAll(automaticPane, generatePrimers);
     }
 

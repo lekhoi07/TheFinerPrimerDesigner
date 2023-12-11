@@ -71,7 +71,6 @@ public class TheFinerPrimerDesigner {
     public void setInputSequence(Sequence newSequence) {
         if (!this.results.isEmpty()) {
             this.setResults(new ArrayList<>(), true);
-
         }
         this.inputSequence = newSequence;
         this.selector.setText(null);
