@@ -5,10 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * It's time for Indy! This is the main class to get things started.
- *
- * Class comments here...
- *
+ * This class sets the primary stage of the program and instantiates the top-level graphical class TabOrganizer.
  */
 
 public class App extends Application {
@@ -16,7 +13,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("TheFinerPrimerDesigner");
-        stage.setScene(new Scene(new TabOrganizer().getRoot(), 700, 700));
+        stage.setScene(new Scene(new TabOrganizer().getRoot(), Constants.APP_SIZE, Constants.APP_SIZE));
         stage.show();
     }
 

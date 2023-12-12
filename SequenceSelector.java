@@ -7,6 +7,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
+/**
+ * This method handles the use of the pane on the right of the display tab for the user to select a certain region
+ * of the DNA template sequence.
+ */
 public class SequenceSelector {
     private GridPane root;
     private SequenceDisplayer displayer;
@@ -14,6 +18,11 @@ public class SequenceSelector {
     private TextField endIndexTextbox;
     private Label gcContent, meltingTemp, length;
 
+    /**
+     * This constructor initializes the instance variables and sets up the GUI.
+     * @param root
+     * @param displayer
+     */
     public SequenceSelector(GridPane root, SequenceDisplayer displayer) {
         this.root = root;
         this.displayer = displayer;
@@ -21,6 +30,9 @@ public class SequenceSelector {
         this.setUpGUI();
     }
 
+    /**
+     * This helper method sets up the GUI consisting of TextAreas and Labels.
+     */
     private void setUpGUI() {
         Label selectRegion = new Label("1. SELECT REGION");
         selectRegion.setTranslateX(50);
@@ -65,15 +77,24 @@ public class SequenceSelector {
         designPrimers.setTranslateX(50);
         designPrimers.setTranslateY(325);
 
+        // Add all created graphical elements.
         this.root.getChildren().addAll(selectRegion, startIndex, endIndex, this.startIndexTextbox, this.endIndexTextbox, selectButton, this.gcContent, this.meltingTemp, this.length, designPrimers);
     }
 
+    /**
+     * This helper method is called when the user presses the select button. It performs error checking on the user's
+     * input and selects the desired region if it passes.
+     * @param start
+     * @param end
+     */
     private void selectRegion(TextField start, TextField end) {
+        // Clean up the user's input by removing extra spaces.
         String startInput = start.getText().replaceAll(" ", "");
         startInput = startInput.replaceAll("\n", "");
         String endInput = end.getText().replaceAll(" ", "");
         endInput = endInput.replaceAll("\n", "");
 
+        // If the user inputs nothing, then de-select everything.
         if (startInput.isEmpty() && endInput.isEmpty()) {
             for (GraphicalNucleotide nucleotide : this.displayer.getGraphicalSequence()) {
                 nucleotide.setFill(Color.WHITE, 1);
@@ -82,6 +103,8 @@ public class SequenceSelector {
             return;
         }
 
+        // If the region is legitimate (start index is less than end index and inputs are integers), then select or
+        // de-select the desired region.
         try {
             int startIndex = Integer.parseInt(startInput);
             int endIndex = Integer.parseInt(endInput);
@@ -102,6 +125,10 @@ public class SequenceSelector {
         }
     }
 
+    /**
+     * This method sets the text that displays the properties of the selected region.
+     * @param selectedRegion
+     */
     public void setText(int[] selectedRegion) {
         if (selectedRegion == null) {
             this.startIndexTextbox.clear();

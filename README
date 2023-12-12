@@ -1,0 +1,34 @@
+README TheFinerPrimerDesigner
+
+Overview: My program is an application that can be used in order to design primers for Polymerase Chain Reaction,
+which is a molecular biology lab technique used to amplify, or make many copies, of a region of DNA called the amplicon.
+Given a template sequence of DNA, primers are necessary to specify the specific region of the template to amplify.
+Specifically, the forward primer is a primer that specifies the start of the region while the reverse primer
+is a primer that specifies the end of the region. Designing primers is a challenging task, and so this application
+would be helpful to those working in a molecular biology laboratory to get high-quality PCR results. Within my program,
+the user is able to upload a template DNA sequence. This will bring the user to another tab in which the inputted
+sequence is displayed in a graphical manner. The user can interact with this graphical sequence by highlighting regions
+of the DNA. From there, the user has 3 options: 1.) they can use their selection as their amplicon, and the program will
+generate the top 10 primer pairs for that region, 2.) they can use their selection as a forward primer, or 3.) they can
+use their selection as a reverse primer. Any primer pair that ends up being designed is then displayed on a third tab
+called the results tab. This is where the user can interact with the primer pairs made including deleting,
+getting more information, and showing/hiding the primer pair graphically on the design tab.
+
+Design choices: In terms of my containment, I decided to have a top-level logic class called TheFinerPrimerDesigner
+instantiate nearly all the other classes in my program. This is because in my program, elements on the different
+tabs must be able to communicate with each other, and this containment structure is ideal for creating many different
+associations. As for polymorphism, I decided to have a superclass called Sequence, from which Primer inherits. Reverse
+Primer then inherits from Primer. This was incredibly useful because Primers are sequences, and so all the properties
+of Sequence I wanted Primer to have. In addition, when creating primer pairs, I could insert both a forward primer and
+a reverse primer into the the same array because ReversePrimer inherited from Primer. This allowed me to code a lot
+more generally. For my complex data structure, I decided to use a hashmap because my complex algorithm of generating
+automatically primer pairs requires storing the goodness score of a primer pair along with the primer pair. My algorithm
+also queries this value a lot, and hashmaps are good for looking up values given a key. For my complex algorithm,
+a notable design choice I made is that I optimized the algorithm by removing bad forward and reverse primers early on.
+This meant that my algorithm would then be able to consider less primer pair match-ups and therefore take way less time.
+
+Known bugs: None.
+
+Hours spent: 40 hours.
+
+Debugging collaborators: None.

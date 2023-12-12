@@ -1,7 +1,6 @@
 package indy;
 
 import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -12,10 +11,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+/**
+ * This class is responsible for managing the graphics of the home screen from which the program starts.
+ */
 public class InputTabPaneOrganizer {
     private StackPane root;
     private TheFinerPrimerDesigner designer;
 
+    /**
+     * This constructor initializes the instance variables and calls the helper methods to display all the graphics.
+     * @param designer
+     */
     public InputTabPaneOrganizer(TheFinerPrimerDesigner designer) {
         this.designer = designer;
         this.root = new StackPane();
@@ -27,6 +33,9 @@ public class InputTabPaneOrganizer {
         return this.root;
     }
 
+    /**
+     * This helper method sets the background of the program to the image specified by the file path.
+     */
     private void displayBackgroundImage() {
         Image image = new Image("./indy/home_background.png");
         ImageView selectedImage = new ImageView();
@@ -40,24 +49,37 @@ public class InputTabPaneOrganizer {
         this.root.getChildren().add(imagePane);
     }
 
+    /**
+     * This helper method creates the button that the user can interact with when they start the program.
+     */
     private void createButtons() {
+        // Create a rectangular border.
         Rectangle inputButtonRect = new Rectangle(200, 50, Color.WHITE);
         inputButtonRect.setStroke(Color.BLACK);
         inputButtonRect.setTranslateY(200);
 
+        // Within that border create a button that prompts the user for input.
         Button inputButton = new Button("INPUT DNA SEQUENCE");
         inputButton.setTranslateY(200);
         inputButton.setOnAction((ActionEvent e) -> this.handleInputButtonPressed());
 
+        // Make a quit program button.
         Button quitButton = new Button("QUIT");
         quitButton.setTranslateY(275);
         quitButton.setOnAction((ActionEvent e) -> {
             WarningMessage message = new WarningMessage("Quitting the program will lose all your work. Do you wish to continue?");
             message.getContinueButton().setOnAction((ActionEvent f) -> System.exit(0));
         });
+
+        // Add everything graphically.
         this.root.getChildren().addAll(inputButtonRect, inputButton, quitButton);
     }
 
+    /**
+     * This helper method is called when the button that allows the user to input data is pressed. It displays
+     * a warning message if there is already a sequence the user is working with, but otherwise, it will instantiate
+     * a new InputProcessor to and a stage into which the user can input text.
+     */
     private void handleInputButtonPressed() {
         if (this.designer.getInputSequence() != null) {
             WarningMessage warning = new WarningMessage("Inputting a new template DNA sequence will override the current one and its corresponding primers. Do you wish to continue?");

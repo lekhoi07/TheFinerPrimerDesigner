@@ -1,30 +1,34 @@
 package indy;
 
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import java.util.ArrayList;
 
+/**
+ * This class manages the graphics of the results tab.
+ */
 public class ResultsDisplayer {
     private ArrayList<GraphicalPrimerPair> results;
     private Pane resultsPaneScrollable;
     private HBox nothingDisplayedPane;
-    private ArrayList<GraphicalPrimerPair> graphicalPrimerPairs;
-    private ScrollPane resultsPane;
     private Rectangle scrollRect;
 
+    /**
+     * This constructor initialzes the instance variables then calls upon a helper method to display the results.
+     * @param resultsPaneScrollable
+     */
     public ResultsDisplayer(Pane resultsPaneScrollable) {
         this.resultsPaneScrollable = resultsPaneScrollable;
-        this.graphicalPrimerPairs = new ArrayList<>();
         this.displayResults();
     }
 
+    /**
+     * This helper method displays a message that there are no results if there are no results. Otherwise, it will
+     * display the results as GraphicalPrimerPairs.
+     */
     private void displayResults() {
         if (this.results == null || this.results.isEmpty()) {
             this.nothingDisplayedPane = new HBox();
@@ -49,14 +53,24 @@ public class ResultsDisplayer {
         }
     }
 
+    /**
+     * This method is called by the top-level logic class to notify this class that there are new results to be
+     * displayed.
+     * @param results
+     */
     public void setResults(ArrayList<GraphicalPrimerPair> results) {
+        // If there are new results, then remove all the previous results.
         if (this.results != null) {
             for (GraphicalPrimerPair pair : this.results) {
                 this.resultsPaneScrollable.getChildren().remove(pair.getPrimerPairPane());
                 this.resultsPaneScrollable.getChildren().remove(this.scrollRect);
             }
         }
+
+        // Set the results to the new results.
         this.results = results;
+
+        // Then display the new results.
         if (this.results != null) {
             this.displayResults();
         }

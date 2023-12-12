@@ -10,15 +10,21 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
 
+/**
+ * This class displays the template DNA sequence the user inputted graphically on the display tab.
+ */
 public class SequenceDisplayer {
     private BorderPane root;
     private Sequence inputSequence;
     private HBox nothingDisplayedPane;
     private ArrayList<GraphicalNucleotide> graphicalSequence;
-    private ScrollPane displayPane;
     private Pane displayPaneScrollable;
     private SequenceSelector selector;
 
+    /**
+     * This constructor initializes the instance variables then displays the template sequence graphically.
+     * @param root
+     */
     public SequenceDisplayer(BorderPane root) {
         this.root = root;
         this.displayPaneScrollable = new Pane();
@@ -36,11 +42,14 @@ public class SequenceDisplayer {
     }
 
     public void setDisplayPane(ScrollPane displayPane) {
-        this.displayPane = displayPane;
         this.displayPaneScrollable = new Pane();
-        this.displayPane.setContent(this.displayPaneScrollable);
+        displayPane.setContent(this.displayPaneScrollable);
     }
 
+    /**
+     * This method displays that there is no sequence when there is no input yet. Otherwise, it will create a
+     * GraphicalNucleotide for each nucleotide in the input sequence.
+     */
     private void displaySequence() {
         if (this.inputSequence == null) {
             this.nothingDisplayedPane = new HBox();
@@ -58,6 +67,9 @@ public class SequenceDisplayer {
         }
     }
 
+    /**
+     * This helper method creates text that indicates the start of the DNA sequence.
+     */
     private void makeStartLabel() {
         Pane sequenceStartPane = new Pane();
         Label startLabel = new Label("DNA SEQUENCE STARTS HERE");
@@ -67,6 +79,9 @@ public class SequenceDisplayer {
         this.displayPaneScrollable.getChildren().addAll(sequenceStartPane, new Rectangle(10, Math.max(this.graphicalSequence.get(this.inputSequence.getLength() - 1).getCoordinates()[1] + 150, 675), Color.LIGHTGRAY));
     }
 
+    /**
+     * This helper method creates text that indicates the end of the template sequence.
+     */
     private void makeEndLabel() {
         Pane sequenceEndPane = new Pane();
         Label endLabel = new Label("DNA SEQUENCE ENDS HERE");
@@ -76,7 +91,13 @@ public class SequenceDisplayer {
         this.displayPaneScrollable.getChildren().add(sequenceEndPane);
     }
 
+    /**
+     * This method helps keep the user's selection continuous because primers and amplicons must be a sequence of
+     * consecutive nucleotides on the template DNA.
+     * @param selectedPosition
+     */
     public void keepSelectionContinuous(int selectedPosition) {
+        // Calculate how many times the color changes on the DNA sequence after the user selects one nucleotide.
         Color currentColor = Color.WHITE;
         int colorChanges = 0;
         int[] colorChangePositions = new int[4];
@@ -88,13 +109,18 @@ public class SequenceDisplayer {
             }
         }
 
+        // If the color changes less than two times, the current selection is continuous and allow the user's selection.
         boolean isContinuous = colorChanges <= 2;
         if (!isContinuous) {
             if (this.graphicalSequence.get(selectedPosition).getFill() == Color.VIOLET) {
+                // If not, then if the user is trying to select, then set every color in between the point of selection
+                // and the previous selection to violet (selected).
                 for (int i = colorChangePositions[1]; i < colorChangePositions[2]; i++) {
                     this.graphicalSequence.get(i).setFill(Color.VIOLET, 1);
                 }
             } else {
+                // If not, then if the user is trying to de-select, then set every color to the right or the left of
+                // the point of selection (whichever one is fewer colors changed) to white (de-selected).
                 if (colorChangePositions[1] - colorChangePositions[0] < colorChangePositions[3] - colorChangePositions[2]) {
                     for (int i = colorChangePositions[0]; i < colorChangePositions[1]; i++) {
                         this.graphicalSequence.get(i).setFill(Color.WHITE, 1);
@@ -108,10 +134,16 @@ public class SequenceDisplayer {
         }
     }
 
+
     public ArrayList<GraphicalNucleotide> getGraphicalSequence() {
         return this.graphicalSequence;
     }
 
+    /**
+     * This method returns the indices of where the selected region starts and ends through getting the indices
+     * of where the color changes on the graphical template sequence.
+     * @return
+     */
     public int[] getSelectedRegion() {
         Color currentColor = Color.WHITE;
         int colorChanges = 0;

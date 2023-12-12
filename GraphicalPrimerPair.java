@@ -7,7 +7,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -17,10 +16,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 
+/**
+ * This class represents a single result that appears on the results tab. It also sets all the things a user can do
+ * to interact with the designed primer pair.
+ */
 public class GraphicalPrimerPair {
     private StackPane primerPairPane;
     private Pane root;
@@ -30,6 +31,12 @@ public class GraphicalPrimerPair {
     private double score;
     private TheFinerPrimerDesigner designer;
 
+    /**
+     * This constructor intializes the instance variables.
+     * @param primerPair
+     * @param score
+     * @param designer
+     */
     public GraphicalPrimerPair(Primer[] primerPair, double score, TheFinerPrimerDesigner designer) {
         this.primerPair = primerPair;
         this.primerPairPane = new StackPane();
@@ -37,7 +44,12 @@ public class GraphicalPrimerPair {
         this.designer = designer;
     }
 
+    /**
+     * This method displays the primer pair as a result.
+     * @param position
+     */
     public void displayGraphicalPrimerPair(int position) {
+        // Create the rectangles with black borders.
         Rectangle mainBox = new Rectangle(658, 150);
         mainBox.setFill(Color.WHITE);
         mainBox.setStroke(Color.BLACK);
@@ -50,11 +62,13 @@ public class GraphicalPrimerPair {
         dataBox.setStroke(Color.BLACK);
         dataBox.setTranslateX(115);
 
+        // Create a label called "ACTIONS" below which the actions the user can do are listed.
         Label actions = new Label("ACTIONS");
         actions.setTranslateY(-50);
         actions.setTranslateX(-215);
         actions.setUnderline(true);
 
+        // Create the buttons.
         Button highlight = new Button("HIDE");
         highlight.setTranslateY(-20);
         highlight.setTranslateX(-215);
@@ -68,6 +82,7 @@ public class GraphicalPrimerPair {
         remove.setTranslateX(-215);
         remove.setOnAction((ActionEvent e) -> this.removePrimerPair());
 
+        // Create the labels that display information about the primer pair.
         Label primerPairHeader = new Label("PRIMER PAIR " + position);
         primerPairHeader.setTranslateY(-50);
         primerPairHeader.setTranslateX(120);
@@ -88,15 +103,20 @@ public class GraphicalPrimerPair {
         ampliconLength.setTranslateX(120);
         ampliconLength.setTranslateY(50);
 
+        // Add everything graphically.
         this.primerPairPane.getChildren().addAll(mainBox, actionBox, dataBox, primerPairHeader, forwardPrimerSeq, reversePrimerSeq, score, ampliconIndex, ampliconLength, actions, highlight, moreInfo, remove);
         this.primerPairPane.setTranslateX(this.calcDisplayCoordinates()[0]);
         this.primerPairPane.setTranslateY(this.calcDisplayCoordinates()[1]);
         this.root.getChildren().add(this.primerPairPane);
     }
 
+    /**
+     * This helper method returns the coordinates the graphical primer pair should be displayed at.
+     * @return
+     */
     private int[] calcDisplayCoordinates() {
         int posX = 20;
-        int posY = 20 + 170 * (this.position - 1);
+        int posY = 20 + Constants.SPACING_BETWEEN_RESULTS * (this.position - 1);
         return new int[]{posX, posY};
     }
 
@@ -120,6 +140,11 @@ public class GraphicalPrimerPair {
         this.graphicalReversePrimer = graphicalReversePrimer;
     }
 
+    /**
+     * This helper method hides or shows the result on the display tab as graphical primers depending on whether
+     * the graphical primers are already hidden or not.
+     * @param highlight
+     */
     private void togglePrimerPair(Button highlight) {
         if (this.graphicalForwardPrimer.isHidden()) {
             highlight.setText("HIDE");
@@ -132,7 +157,12 @@ public class GraphicalPrimerPair {
         }
     }
 
+    /**
+     * This helper method is called whenever the user clicks on the button that requests more info on the primer pair.
+     * It creates a new stage with all the info.
+     */
     private void displayProperties() {
+        // Create stage that displays information.
         Stage propertyStage = new Stage();
         BorderPane propertyPane = new BorderPane();
         TextArea info = new TextArea();
@@ -148,8 +178,9 @@ public class GraphicalPrimerPair {
         propertyStage.setTitle("COMPLETE PRIMER PAIR INFORMATION");
         propertyStage.show();
 
+        // Set the content of that information.
         info.setText(
-                "Primer Pair Score: " + this.primerPair[0].compatibilityScore(this.primerPair[1]) + "\n" +
+                "Primer Pair Score: " + (this.primerPair[0].compatibilityScore(this.primerPair[1]) + this.primerPair[0].goodnessScore() + this.primerPair[1].goodnessScore()) + "\n" +
                 "Amplicon Start: " + (this.primerPair[0].getPosition()[1] + 1) + ", End: " + (this.primerPair[1].getPosition()[0] - 1) + "\n" +
                 "Amplicon Length: " + (this.primerPair[1].getPosition()[0] - this.primerPair[0].getPosition()[1] - 1) +" bp\n" +
                 "\n" +
@@ -167,12 +198,20 @@ public class GraphicalPrimerPair {
         );
     }
 
+    /**
+     * This method is called when the user clicks on the remove button. It removes the result both graphically and
+     * logically.
+     */
     private void removePrimerPair() {
+        // Warn the user that removing is undoable.
         WarningMessage warning = new WarningMessage("Are you sure you want to delete this primer pair? This action cannot be undone.");
         warning.getContinueButton().setOnAction((ActionEvent e) -> {
+            // If the user decides to continue, remove the graphical primers graphically.
             warning.getWarningStage().close();
             this.graphicalForwardPrimer.hide();
             this.graphicalReversePrimer.hide();
+
+            // ALso remove the result logically while displaying a fade-out animation.
             ArrayList<GraphicalPrimerPair> newResults = new ArrayList<>(this.designer.getResults());
             newResults.remove(this);
             KeyFrame kf = new KeyFrame(Duration.seconds(0.1), (ActionEvent f) -> this.primerPairPane.setOpacity(this.primerPairPane.getOpacity() * .75));

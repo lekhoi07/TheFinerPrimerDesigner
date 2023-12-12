@@ -9,18 +9,30 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Method;
-
+/**
+ * This class represents a stage that pops up when a warning message needs to be displayed. The stage will let the user
+ * continue with the intended action if the user presses the continue button.
+ */
 public class WarningMessage {
     private Stage warningStage;
     private Button continueButton;
 
+    /**
+     * This constructor initializes the instance variables and displays the warning stage.
+     * @param message
+     */
     public WarningMessage(String message) {
         this.warningStage = new Stage();
         this.warningStage.setScene(new Scene(this.createWarningPane(message)));
         this.warningStage.setTitle("WARNING");
         this.warningStage.show();
     }
+
+    /**
+     * This helper method sets up the warning stage graphically with its warning text and two buttons.
+     * @param message
+     * @return
+     */
     private BorderPane createWarningPane(String message) {
         BorderPane warningPane = new BorderPane();
         Label warningMessage = new Label(message);
